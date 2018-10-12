@@ -10,6 +10,21 @@ function Square(props) {
   );
 }
 
+function winnerBox(winner) {
+  let txt = "Congratulations " + winner + "!";
+  return (
+    <div>
+      <div>{txt}</div>
+      <button
+        className="playAgainButton"
+        onClick={() => window.location.reload()}
+      >
+        Play again
+      </button>
+    </div>
+  );
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -21,6 +36,9 @@ class Board extends React.Component {
 
   handleClick(i) {
     const squares = this.state.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
     squares[i] = "X";
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
@@ -38,8 +56,31 @@ class Board extends React.Component {
     );
   }
 
+  reloadFunction(winner) {
+    if (winner) {
+      if (
+        window.confirm("Winner: " + winner + "\n" + "Do you want to reload?")
+      ) {
+        window.location.reload();
+      }
+    }
+  }
+
+  returnWinnerBox(winner) {
+    // return <WinnerBox(winner) />;
+  }
+
   render() {
-    const status = "Next player: X";
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    let winnerbox;
+    if (winner) {
+      status = "Winner: " + winner;
+      //this.reloadFunction(winner);
+      winnerbox = winnerBox(winner);
+    } else {
+      status = "Next player: " + (this.state.xIsNext ? "X" : "0");
+    }
 
     return (
       <div>
@@ -59,6 +100,7 @@ class Board extends React.Component {
           {this.renderSquare(7)}
           {this.renderSquare(8)}
         </div>
+        <div>{winnerbox}</div>
       </div>
     );
   }
@@ -95,4 +137,11 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6]
   ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[b] === squares[a] && squares[c] === squares[a]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
